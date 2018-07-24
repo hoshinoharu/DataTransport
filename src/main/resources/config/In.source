@@ -1,0 +1,7 @@
+{
+	"ServerIP":"192.168.1.149",
+	"Port":1433,
+	"DataBase":"LearnPlatform",
+	"UserName":"sa",
+	"Password":"iflysse"
+}
