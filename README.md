@@ -9,7 +9,7 @@
 ### DataBaseDataTableSource 
 数据库类型的数据源 是项目中使用的数据源的基类 根据传入的连接信息 连接数据库
 ### SqlServerDataDataTableSource
-sqlserver 数据库的数据源类 有针对sqlserver的查询和插入语句 本项目中用来查询数据
+sqlserver 数据库的数据源类 有针对sqlserver的查询和插入语句 本项目中用来查询数据 查询每张表的数据时调用的sql为SELECT * FROM
 ### MySqlDataTableSource
 mysql 数据库的数据源类 有针对mysql的插入和查询sql 本项目中用来插入数据
 
@@ -128,3 +128,13 @@ public class JobInfo {
             dataTransport.transportAll();
         }
 ```
+
+## 任务状态保存
+插入数据时使用事务，事务提交时保存当前插入的表的名称和表在In.getAllTableNames() 中的索引，保存插入的数据的行数，下次读取时调DynamicDataTable.skipRows(long count)方法来直接从索引位置继续任务。
+
+## 效率 
+公司的线上备份sqlserver数据库中的数据量为4000w+ 转到局域网中的一台mysql中 耗时为一天一夜
+## 注意事项
+在任务错误回调时 如果是sql或者数据类型错误的异常，是无法重新继续插入数据的，因为再次开始依然还是会错误，这里的报错自动继续 是在网络错误的情况下调用
+
+请务必确定两边数据库的表结构的一致性
