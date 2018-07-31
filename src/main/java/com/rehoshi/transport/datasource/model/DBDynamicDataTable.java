@@ -36,8 +36,8 @@ public class DBDynamicDataTable extends DynamicDataTable {
 
     //跳过多少行
     @Override
-    public void skipRows(long count) throws Exception {
-        long skips = 0;
+    public void skipRows(int count) throws Exception {
+        int skips = 0;
         while (skips < count) {
             resultSet.next();
             skips++;

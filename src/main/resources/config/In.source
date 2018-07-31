@@ -3,5 +3,5 @@
 	"Port":1433,
 	"DataBase":"LearnPlatform",
 	"UserName":"sa",
-	"Password":"iflysse"
+	"Password":""
 }

@@ -18,5 +18,5 @@ public abstract class DynamicDataTable extends DataTable {
     public abstract DataRow nextRow() throws Exception;
 
     //需要跳过数据行的长度
-    public abstract void skipRows(long count) throws Exception;
+    public abstract void skipRows(int count) throws Exception;
 }

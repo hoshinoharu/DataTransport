@@ -1,5 +1,6 @@
 package com.rehoshi.transport.datasource.impl;
 
+import com.rehoshi.transport.datasource.model.DBConnectionInfo;
 import com.rehoshi.transport.datasource.model.DataRow;
 import com.rehoshi.transport.datasource.model.StaticDataTable;
 import com.rehoshi.utils.DBUtil;
@@ -13,14 +14,14 @@ import java.util.List;
 //mysql的数据源 针对mysql的连接参数 和 sql语句
 public class MySqlDataTableSource extends DataBaseDataTableSource {
 
-    private static String connParams = "useUnicode=true&serverTimezone=UTC&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&rewriteBatchedStatements=true";
+    private static String connParams = "useUnicode=true&serverTimezone=Asia/Shanghai&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&rewriteBatchedStatements=true";
 
     public MySqlDataTableSource(String dbIp, int port, String database, String userName, String password) {
         super(dbIp, port, database, userName, password);
     }
 
-    public MySqlDataTableSource(String configPath) {
-        super(configPath);
+    public MySqlDataTableSource(DBConnectionInfo info) {
+        super(info);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.rehoshi.transport.datasource.impl;
 
+import com.rehoshi.transport.datasource.model.DBConnectionInfo;
 import com.rehoshi.transport.datasource.model.DynamicDataTable;
 import com.rehoshi.transport.datasource.model.StaticDataTable;
 
@@ -14,8 +15,8 @@ public class SqlServerDataDataTableSource extends DataBaseDataTableSource {
         super(dbIp, port, database, userName, password);
     }
 
-    public SqlServerDataDataTableSource(String configPath) {
-        super(configPath);
+    public SqlServerDataDataTableSource(DBConnectionInfo info) {
+        super(info);
     }
 
     @Override
@@ -68,7 +69,7 @@ public class SqlServerDataDataTableSource extends DataBaseDataTableSource {
     public DynamicDataTable getDynamicTableFromIndex(String tableName, long startIndex) throws Exception {
         DynamicDataTable dataTable = super.getDynamicTableFromIndex(tableName, startIndex);
         //索引从1开始 跳过之前的数据
-        dataTable.skipRows(startIndex - 1);
+        dataTable.skipRows((int) (startIndex - 1));
         return dataTable;
     }
 
@@ -93,6 +94,6 @@ public class SqlServerDataDataTableSource extends DataBaseDataTableSource {
 
     @Override
     protected String createGetTableDataCountSql(String tableName) {
-        return "SELECT rows FROM sysindexes ii INNER JOIN sysobjects oo ON ( oo.id = ii.id AND oo.xtype = 'U ') WHERE   ii.indid < 2 AND OBJECT_NAME(ii.id) = '" + tableName + "'" ;
+        return "SELECT rows FROM sysindexes ii INNER JOIN sysobjects oo ON ( oo.id = ii.id AND oo.xtype = 'U ') WHERE   ii.indid < 2 AND OBJECT_NAME(ii.id) = '" + tableName + "'";
     }
 }

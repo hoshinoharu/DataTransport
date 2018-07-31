@@ -1,12 +1,9 @@
 package com.rehoshi.transport.datasource.impl;
 
-import com.google.gson.Gson;
 import com.rehoshi.transport.datasource.i.DataTableSource;
 import com.rehoshi.transport.datasource.model.*;
 import com.rehoshi.utils.DBUtil;
 
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.sql.*;
 import java.util.*;
 import java.util.function.Predicate;
@@ -40,18 +37,14 @@ public abstract class DataBaseDataTableSource implements DataTableSource {
     //数据table的缓存
     private Map<String, StaticDataTable> tableCache = new HashMap<>();
 
-    public DataBaseDataTableSource(String configPath) {
-        try {
-            DBConnectionInfo info = new Gson().fromJson(new FileReader(configPath), DBConnectionInfo.class);
-            this.dbIp = info.serverIP;
-            this.port = info.port;
-            this.database = info.database;
-            this.userName = info.userName;
-            this.password = info.password;
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
+    public DataBaseDataTableSource(DBConnectionInfo info) {
+        this.dbIp = info.serverIP;
+        this.port = info.port;
+        this.database = info.database;
+        this.userName = info.userName;
+        this.password = info.password;
     }
+
 
     public DataBaseDataTableSource(String dbIp, int port, String database, String userName, String password) {
         this.dbIp = dbIp;
@@ -64,7 +57,7 @@ public abstract class DataBaseDataTableSource implements DataTableSource {
     @Override
     public StaticDataTable getAllFromTable(String tableName) {
         try {
-            StaticDataTable table = readFromDb(tableName, "SELECT * FROM" + tableName);
+            StaticDataTable table = readFromDb(tableName, "SELECT * FROM " + tableName);
             table.setTableName(tableName);
             return table;
         } catch (SQLException e) {
@@ -121,7 +114,7 @@ public abstract class DataBaseDataTableSource implements DataTableSource {
     }
 
     protected String createGetTableDataCountSql(String tableName) {
-        return "SELECT COUNT (*) FROM " + tableName;
+        return "SELECT COUNT(*) FROM " + tableName;
     }
 
     //创建获取所有表名的sql语句
@@ -366,4 +359,16 @@ public abstract class DataBaseDataTableSource implements DataTableSource {
         return "SELECT * FROM " + tableName;
     }
 
+    public static DataBaseDataTableSource createDataSourceWithConnectionInfo(DBConnectionInfo info) {
+        DataBaseDataTableSource dataTableSource = null;
+        switch (info.dbType.toUpperCase()) {
+            case "SQLSERVER":
+                dataTableSource = new SqlServerDataDataTableSource(info);
+                break;
+            case "MYSQL":
+                dataTableSource = new MySqlDataTableSource(info);
+                break;
+        }
+        return dataTableSource;
+    }
 }

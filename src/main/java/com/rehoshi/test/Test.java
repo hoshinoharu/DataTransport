@@ -2,8 +2,8 @@ package com.rehoshi.test;
 
 import com.google.gson.Gson;
 import com.rehoshi.config.TransportConfig;
-import com.rehoshi.transport.datasource.impl.MySqlDataTableSource;
-import com.rehoshi.transport.datasource.impl.SqlServerDataDataTableSource;
+import com.rehoshi.transport.datasource.impl.DataBaseDataTableSource;
+import com.rehoshi.transport.datasource.model.DBConnectionInfo;
 import com.rehoshi.transport.job.AsyncJob;
 import com.rehoshi.transport.job.DataTransport;
 import com.rehoshi.transport.job.JobInfo;
@@ -16,14 +16,18 @@ public class Test {
         //获取配置文件
         TransportConfig config = new TransportConfig(true);
 
-        //配置数据源
-        SqlServerDataDataTableSource sqlServerDS = new SqlServerDataDataTableSource(
-                config.getSourceInPath()
-        );
-        MySqlDataTableSource mySqlDataSource = new MySqlDataTableSource(
-                config.getSourceOutPath()
-        );
+        DBConnectionInfo inSource = null;
+        DBConnectionInfo outSource = null;
+        try {
+            inSource = new Gson().fromJson(new FileReader(config.getSourceInPath()), DBConnectionInfo.class);
+            outSource = new Gson().fromJson(new FileReader(config.getSourceOutPath()), DBConnectionInfo.class);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
+        //配置数据源
+        DataBaseDataTableSource sourceIn = DataBaseDataTableSource.createDataSourceWithConnectionInfo(inSource);
+        DataBaseDataTableSource sourceOut = DataBaseDataTableSource.createDataSourceWithConnectionInfo(outSource);
 
         //加载工作信息
         JobInfo jobInfo = null;
@@ -34,8 +38,8 @@ public class Test {
         }
 
         //创建传输任务
-        DataTransport<SqlServerDataDataTableSource, MySqlDataTableSource> dataTransport
-                = new AsyncJob<>(sqlServerDS, mySqlDataSource, config.getJobsHomePath(), jobInfo.name, config.getLogPath());
+        DataTransport<DataBaseDataTableSource, DataBaseDataTableSource> dataTransport
+                = new AsyncJob<>(sourceIn, sourceOut, config.getJobsHomePath(), jobInfo.name, config.getLogPath());
 
         //报错之后尝试重启任务 针对 网络错误 设置可以继续开始迁移
         dataTransport.setOnTransportErrorListener(e -> {
@@ -54,7 +58,7 @@ public class Test {
             dataTransport.autoTransport();
         } else {
             //设置 一次插入的大小 DataReader的缓存大小
-            dataTransport.setBatchSize(3000);
+            dataTransport.setBatchSize(jobInfo.batchSize);
             //传输全部数据表
             dataTransport.transportAll();
         }

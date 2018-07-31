@@ -3,5 +3,5 @@
 	"Port":3306,
 	"DataBase":"test_trans_18_07_10",
 	"UserName":"admin",
-	"Password":"iflysse"
+	"Password":""
 }

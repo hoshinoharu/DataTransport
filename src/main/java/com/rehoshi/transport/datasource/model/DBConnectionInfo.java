@@ -18,4 +18,7 @@ public class DBConnectionInfo {
 
     @SerializedName("Password")
     public String password ;
+
+    @SerializedName("DBType")
+    public String dbType ;
 }
